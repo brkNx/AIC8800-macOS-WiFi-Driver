@@ -1,0 +1,98 @@
+name: Build & Release
+
+on:
+  push:
+    branches: [ main, develop ]
+  pull_request:
+    branches: [ main ]
+  release:
+    types: [created]
+
+jobs:
+  build-app:
+    name: Build macOS App
+    runs-on: macos-14
+    
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v4
+      
+    - name: Setup Xcode
+      uses: maxim-lobanov/setup-xcode@v1
+      with:
+        xcode-version: '15.0'
+        
+    - name: Build App
+      run: |
+        xcodebuild -scheme AIC8800WiFi \
+          -configuration Release \
+          -derivedDataPath build \
+          CODE_SIGN_IDENTITY="" \
+          CODE_SIGNING_REQUIRED=NO
+          
+    - name: Upload Build Artifact
+      uses: actions/upload-artifact@v4
+      with:
+        name: AIC8800WiFi-App
+        path: build/Build/Products/Release/AIC8800WiFi.app
+        retention-days: 30
+
+  build-dext:
+    name: Build DriverKit Extension
+    runs-on: macos-14
+    
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v4
+      
+    - name: Setup Xcode
+      uses: maxim-lobanov/setup-xcode@v1
+      with:
+        xcode-version: '15.0'
+        
+    - name: Build DEXT
+      run: |
+        xcodebuild -scheme AIC8800WiFi_DEXT \
+          -configuration Release \
+          -derivedDataPath build \
+          CODE_SIGN_IDENTITY="" \
+          CODE_SIGNING_REQUIRED=NO
+          
+    - name: Upload Build Artifact
+      uses: actions/upload-artifact@v4
+      with:
+        name: AIC8800WiFi-DEXT
+        path: build/Build/Products/Release/AIC8800WiFi_DEXT.dext
+        retention-days: 30
+
+  release:
+    name: Create Release
+    needs: [build-app, build-dext]
+    runs-on: ubuntu-latest
+    if: github.event_name == 'release'
+    
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v4
+      
+    - name: Download App Artifact
+      uses: actions/download-artifact@v4
+      with:
+        name: AIC8800WiFi-App
+        
+    - name: Download DEXT Artifact
+      uses: actions/download-artifact@v4
+      with:
+        name: AIC8800WiFi-DEXT
+        
+    - name: Create ZIP
+      run: |
+        zip -r AIC8800WiFi-macOS.zip AIC8800WiFi.app AIC8800WiFi_DEXT.dext
+        
+    - name: Upload to Release
+      uses: softprops/action-gh-release@v1
+      with:
+        files: AIC8800WiFi-macOS.zip
+        generate_release_notes: true
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
