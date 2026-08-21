@@ -1,0 +1,54 @@
+/*
+ * Copyright (c) 2024. AIC8800 macOS WiFi Driver
+ *
+ * Network Interface Definition (IIG)
+ * This file defines the DriverKit interface for network functionality.
+ */
+
+#ifndef AIC8800_NETIF_IIG
+#define AIC8800_NETIF_IIG
+
+#include <DriverKit/IOTypes.h>
+#include <NetworkDriverKit/IOUserNetworkEthernet.h>
+
+// ============================================================================
+// AIC8800 Network Interface
+// ============================================================================
+
+interface AIC8800_NetIf : IOUserNetworkEthernet
+{
+    // Network Lifecycle
+    kern_return_t Start(IOService *provider) override;
+    kern_return_t Stop(IOService *provider) override;
+
+    // Network Configuration
+    kern_return_t GetHardwareAddress(IOEthernetAddress *addr);
+    kern_return_t SetHardwareAddress(const IOEthernetAddress *addr);
+    kern_return_t GetPacketFilters(uint32_t *filters);
+    kern_return_t SetPacketFilters(uint32_t filters);
+
+    // Data Path
+    kern_return_t OutputPacket(mbuf_t m, void *param);
+    kern_return_t InputPacket(const uint8_t *data, uint32_t length);
+
+    // Power Management
+    kern_return_t SetPowerState(uint32_t powerState);
+
+    // Scan Operations
+    kern_return_t StartScan(const uint8_t *ssid, uint8_t ssid_len,
+                            uint8_t channel);
+    kern_return_t GetScanResults(void *buffer, uint32_t buffer_size,
+                                 uint32_t *result_count);
+
+    // Association
+    kern_return_t Associate(const uint8_t *bssid, const uint8_t *ssid,
+                            uint8_t ssid_len, const uint8_t *key,
+                            uint32_t key_len);
+    kern_return_t Disassociate(void);
+
+    // Status
+    kern_return_t GetLinkStatus(uint32_t *status);
+    kern_return_t GetSignalQuality(int8_t *quality);
+};
+
+#endif /* AIC8800_NETIF_IIG */

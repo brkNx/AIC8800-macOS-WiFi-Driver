@@ -1,0 +1,32 @@
+# Build directories
+build/
+DerivedData/
+*.build/
+
+# Xcode
+*.xcodeproj/project.xcworkspace/xcuserdata/
+*.xcodeproj/xcuserdata/
+*.xcworkspace/xcuserdata/
+
+# macOS
+.DS_Store
+.AppleDouble
+.LSOverride
+
+# Temporary files
+*.tmp
+*.swp
+*~
+
+# Firmware binaries (not distributable)
+Firmware/aic8800D80/*.bin
+Firmware/aic8800D80/*.fw
+
+# Compiled binaries
+*.o
+*.kext
+*.dext
+*.appex
+
+# Logs
+*.log
