@@ -1,0 +1,398 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 56;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		000000000000000000000101 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 000000000000000000000201 /* AppDelegate.swift */; };
+		000000000000000000000102 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 000000000000000000000202 /* ContentView.swift */; };
+		000000000000000000000103 /* StatusManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 000000000000000000000203 /* StatusManager.swift */; };
+		000000000000000000000111 /* AIC8800_USB.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 000000000000000000000211 /* AIC8800_USB.cpp */; };
+		000000000000000000000112 /* AIC8800_HALInit.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 000000000000000000000212 /* AIC8800_HALInit.cpp */; };
+		000000000000000000000113 /* AIC8800_NetIf.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 000000000000000000000213 /* AIC8800_NetIf.cpp */; };
+		000000000000000000000114 /* AIC8800_UserClient.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 000000000000000000000214 /* AIC8800_UserClient.cpp */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXContainerItemProxy section */
+		000000000000000000000B02 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 000000000000000000000C01 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 000000000000000000000802;
+			remoteInfo = AIC8800WiFi_DEXT;
+		};
+/* End PBXContainerItemProxy section */
+
+/* Begin PBXFileReference section */
+		000000000000000000000201 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = AppDelegate.swift; path = AIC8800_App/Sources/AppDelegate.swift; sourceTree = SOURCE_ROOT; };
+		000000000000000000000202 /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = ContentView.swift; path = AIC8800_App/Sources/ContentView.swift; sourceTree = SOURCE_ROOT; };
+		000000000000000000000203 /* StatusManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = StatusManager.swift; path = AIC8800_App/Sources/StatusManager.swift; sourceTree = SOURCE_ROOT; };
+		000000000000000000000204 /* AIC8800_App.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; name = AIC8800_App.entitlements; path = AIC8800_App/AIC8800_App.entitlements; sourceTree = SOURCE_ROOT; };
+		000000000000000000000205 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; name = Info.plist; path = AIC8800_App/Info.plist; sourceTree = SOURCE_ROOT; };
+		000000000000000000000211 /* AIC8800_USB.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; name = AIC8800_USB.cpp; path = AIC8800_DEXT/Sources/AIC8800_USB.cpp; sourceTree = SOURCE_ROOT; };
+		000000000000000000000212 /* AIC8800_HALInit.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; name = AIC8800_HALInit.cpp; path = AIC8800_DEXT/Sources/AIC8800_HALInit.cpp; sourceTree = SOURCE_ROOT; };
+		000000000000000000000213 /* AIC8800_NetIf.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; name = AIC8800_NetIf.cpp; path = AIC8800_DEXT/Sources/AIC8800_NetIf.cpp; sourceTree = SOURCE_ROOT; };
+		000000000000000000000214 /* AIC8800_UserClient.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; name = AIC8800_UserClient.cpp; path = AIC8800_DEXT/Sources/AIC8800_UserClient.cpp; sourceTree = SOURCE_ROOT; };
+		000000000000000000000215 /* AIC8800_Driver.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = AIC8800_Driver.h; path = AIC8800_DEXT/Headers/AIC8800_Driver.h; sourceTree = SOURCE_ROOT; };
+		000000000000000000000216 /* AIC8800_USB.iig */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.iig; name = AIC8800_USB.iig; path = AIC8800_DEXT/Sources/AIC8800_USB.iig; sourceTree = SOURCE_ROOT; };
+		000000000000000000000217 /* AIC8800_NetIf.iig */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.iig; name = AIC8800_NetIf.iig; path = AIC8800_DEXT/Sources/AIC8800_NetIf.iig; sourceTree = SOURCE_ROOT; };
+		000000000000000000000218 /* AIC8800_UserClient.iig */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.iig; name = AIC8800_UserClient.iig; path = AIC8800_DEXT/Sources/AIC8800_UserClient.iig; sourceTree = SOURCE_ROOT; };
+		000000000000000000000219 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; name = Info.plist; path = AIC8800_DEXT/Info.plist; sourceTree = SOURCE_ROOT; };
+		00000000000000000000021A /* AIC8800_DEXT.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; name = AIC8800_DEXT.entitlements; path = AIC8800_DEXT/AIC8800_DEXT.entitlements; sourceTree = SOURCE_ROOT; };
+		000000000000000000000301 /* AIC8800WiFi.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = AIC8800WiFi.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		000000000000000000000302 /* AIC8800WiFi_DEXT.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = AIC8800WiFi_DEXT.appex; sourceTree = BUILT_PRODUCTS_DIR; };
+/* End PBXFileReference section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		000000000000000000000401 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		000000000000000000000402 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
+
+/* Begin PBXGroup section */
+		000000000000000000000501 = {
+			isa = PBXGroup;
+			children = (
+				000000000000000000000601 /* AIC8800_App */,
+				000000000000000000000602 /* AIC8800_DEXT */,
+				000000000000000000000701 /* Products */,
+			);
+			sourceTree = "<group>";
+		};
+		000000000000000000000601 /* AIC8800_App */ = {
+			isa = PBXGroup;
+			children = (
+				000000000000000000000201 /* AppDelegate.swift */,
+				000000000000000000000202 /* ContentView.swift */,
+				000000000000000000000203 /* StatusManager.swift */,
+				000000000000000000000205 /* Info.plist */,
+				000000000000000000000204 /* AIC8800_App.entitlements */,
+			);
+			name = AIC8800_App;
+			sourceTree = "<group>";
+		};
+		000000000000000000000602 /* AIC8800_DEXT */ = {
+			isa = PBXGroup;
+			children = (
+				000000000000000000000215 /* AIC8800_Driver.h */,
+				000000000000000000000211 /* AIC8800_USB.cpp */,
+				000000000000000000000212 /* AIC8800_HALInit.cpp */,
+				000000000000000000000213 /* AIC8800_NetIf.cpp */,
+				000000000000000000000214 /* AIC8800_UserClient.cpp */,
+				000000000000000000000216 /* AIC8800_USB.iig */,
+				000000000000000000000217 /* AIC8800_NetIf.iig */,
+				000000000000000000000218 /* AIC8800_UserClient.iig */,
+				000000000000000000000219 /* Info.plist */,
+				00000000000000000000021A /* AIC8800_DEXT.entitlements */,
+			);
+			name = AIC8800_DEXT;
+			sourceTree = "<group>";
+		};
+		000000000000000000000701 /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				000000000000000000000301 /* AIC8800WiFi.app */,
+				000000000000000000000302 /* AIC8800WiFi_DEXT.appex */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXNativeTarget section */
+		000000000000000000000801 /* AIC8800WiFi */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 000000000000000000000901 /* Build configuration list for PBXNativeTarget "AIC8800WiFi" */;
+			buildPhases = (
+				000000000000000000000A01 /* Sources */,
+				000000000000000000000401 /* Frameworks */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				000000000000000000000B01 /* PBXTargetDependency */,
+			);
+			name = AIC8800WiFi;
+			productName = AIC8800WiFi;
+			productReference = 000000000000000000000301 /* AIC8800WiFi.app */;
+			productType = "com.apple.product-type.application";
+		};
+		000000000000000000000802 /* AIC8800WiFi_DEXT */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 000000000000000000000902 /* Build configuration list for PBXNativeTarget "AIC8800WiFi_DEXT" */;
+			buildPhases = (
+				000000000000000000000A02 /* Sources */,
+				000000000000000000000402 /* Frameworks */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = AIC8800WiFi_DEXT;
+			productName = AIC8800WiFi_DEXT;
+			productReference = 000000000000000000000302 /* AIC8800WiFi_DEXT.appex */;
+			productType = "com.apple.product-type.app-extension";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		000000000000000000000C01 /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				BuildIndependentTargetsInParallel = 1;
+				LastSwiftUpdateCheck = 1500;
+				LastUpgradeCheck = 1500;
+				TargetAttributes = {
+					000000000000000000000801 = {
+						CreatedOnToolsVersion = 15.0;
+					};
+					000000000000000000000802 = {
+						CreatedOnToolsVersion = 15.0;
+					};
+				};
+			};
+			buildConfigurationList = 000000000000000000000903 /* Build configuration list for PBXProject "AIC8800WiFi" */;
+			compatibilityVersion = "Xcode 14.0";
+			developmentRegion = en;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				en,
+				Base,
+			);
+			mainGroup = 000000000000000000000501;
+			productRefGroup = 000000000000000000000701 /* Products */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				000000000000000000000801 /* AIC8800WiFi */,
+				000000000000000000000802 /* AIC8800WiFi_DEXT */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXSourcesBuildPhase section */
+		000000000000000000000A01 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				000000000000000000000101 /* AppDelegate.swift in Sources */,
+				000000000000000000000102 /* ContentView.swift in Sources */,
+				000000000000000000000103 /* StatusManager.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		000000000000000000000A02 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				000000000000000000000111 /* AIC8800_USB.cpp in Sources */,
+				000000000000000000000112 /* AIC8800_HALInit.cpp in Sources */,
+				000000000000000000000113 /* AIC8800_NetIf.cpp in Sources */,
+				000000000000000000000114 /* AIC8800_UserClient.cpp in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin PBXTargetDependency section */
+		000000000000000000000B01 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 000000000000000000000802 /* AIC8800WiFi_DEXT */;
+			targetProxy = 000000000000000000000B02 /* PBXContainerItemProxy */;
+		};
+/* End PBXTargetDependency section */
+
+/* Begin XCBuildConfiguration section */
+		000000000000000000000D01 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
+				CLANG_ENABLE_OBJC_ARC = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = dwarf;
+				GCC_C_LANGUAGE_STANDARD = gnu17;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"DEBUG=1",
+					"$(inherited)",
+				);
+				MACOSX_DEPLOYMENT_TARGET = 13.0;
+				ONLY_ACTIVE_ARCH = YES;
+				SDKROOT = macosx;
+			};
+			name = Debug;
+		};
+		000000000000000000000D02 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
+				CLANG_ENABLE_OBJC_ARC = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				ENABLE_NS_ASSERTIONS = NO;
+				GCC_C_LANGUAGE_STANDARD = gnu17;
+				MACOSX_DEPLOYMENT_TARGET = 13.0;
+				SDKROOT = macosx;
+			};
+			name = Release;
+		};
+		000000000000000000000D03 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_ENTITLEMENTS = AIC8800_App/AIC8800_App.entitlements;
+				CODE_SIGN_STYLE = Automatic;
+				COMBINE_HIDPI_IMAGES = YES;
+				CURRENT_PROJECT_VERSION = 1;
+				ENABLE_HARDENED_RUNTIME = YES;
+				GENERATE_INFOPLIST_FILE = NO;
+				INFOPLIST_FILE = AIC8800_App/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/../Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.aic8800.wifi;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_VERSION = 5.0;
+			};
+			name = Debug;
+		};
+		000000000000000000000D04 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_ENTITLEMENTS = AIC8800_App/AIC8800_App.entitlements;
+				CODE_SIGN_STYLE = Automatic;
+				COMBINE_HIDPI_IMAGES = YES;
+				CURRENT_PROJECT_VERSION = 1;
+				ENABLE_HARDENED_RUNTIME = YES;
+				GENERATE_INFOPLIST_FILE = NO;
+				INFOPLIST_FILE = AIC8800_App/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/../Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.aic8800.wifi;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_VERSION = 5.0;
+			};
+			name = Release;
+		};
+		000000000000000000000D05 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_ENTITLEMENTS = AIC8800_DEXT/AIC8800_DEXT.entitlements;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				GENERATE_INFOPLIST_FILE = NO;
+				HEADER_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(SDKROOT)/System/Library/Frameworks/DriverKit.framework/Headers",
+					"$(SDKROOT)/System/Library/Frameworks/USBDriverKit.framework/Headers",
+				);
+				INFOPLIST_FILE = AIC8800_DEXT/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/../Frameworks",
+					"@executable_path/../../../../Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				OTHER_LDFLAGS = (
+					"-framework",
+					"DriverKit",
+					"-framework",
+					"USBDriverKit",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = com.aic8800.wifi.dext;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SKIP_INSTALL = NO;
+			};
+			name = Debug;
+		};
+		000000000000000000000D06 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_ENTITLEMENTS = AIC8800_DEXT/AIC8800_DEXT.entitlements;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				GENERATE_INFOPLIST_FILE = NO;
+				HEADER_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(SDKROOT)/System/Library/Frameworks/DriverKit.framework/Headers",
+					"$(SDKROOT)/System/Library/Frameworks/USBDriverKit.framework/Headers",
+				);
+				INFOPLIST_FILE = AIC8800_DEXT/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/../Frameworks",
+					"@executable_path/../../../../Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				OTHER_LDFLAGS = (
+					"-framework",
+					"DriverKit",
+					"-framework",
+					"USBDriverKit",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = com.aic8800.wifi.dext;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SKIP_INSTALL = NO;
+			};
+			name = Release;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		000000000000000000000901 /* Build configuration list for PBXNativeTarget "AIC8800WiFi" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				000000000000000000000D03 /* Debug */,
+				000000000000000000000D04 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		000000000000000000000902 /* Build configuration list for PBXNativeTarget "AIC8800WiFi_DEXT" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				000000000000000000000D05 /* Debug */,
+				000000000000000000000D06 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		000000000000000000000903 /* Build configuration list for PBXProject "AIC8800WiFi" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				000000000000000000000D01 /* Debug */,
+				000000000000000000000D02 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+/* End XCConfigurationList section */
+
+	};
+	rootObject = 000000000000000000000C01 /* Project object */;
+}
