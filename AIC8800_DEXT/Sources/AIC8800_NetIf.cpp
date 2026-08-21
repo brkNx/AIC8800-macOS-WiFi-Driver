@@ -5,7 +5,14 @@
  */
 
 #include "AIC8800_Driver.h"
+#include "AIC8800_USB.iig"
 #include "AIC8800_NetIf.iig"
+
+static AIC8800_DriverData *AIC8800_GetDriverData(IOService *provider)
+{
+    AIC8800_USB *usb_driver = (AIC8800_USB *)provider;
+    return usb_driver ? usb_driver->driver_data : nullptr;
+}
 
 // ============================================================================
 // Network Interface Lifecycle
@@ -42,7 +49,8 @@ kern_return_t AIC8800_NetIf::GetHardwareAddress(IOEthernetAddress *addr)
     if (!addr) return kIOReturnBadArgument;
 
     // Get MAC address from driver data
-    AIC8800_DriverData *driver = (AIC8800_DriverData *)GetProvider()->getProvider();
+    AIC8800_DriverData *driver = AIC8800_GetDriverData(GetProvider());
+    if (!driver) return kIOReturnNotReady;
 
     // Copy MAC address
     memcpy(addr->bytes, driver->config.mac_address, AIC8800_ETH_ALEN);
@@ -59,7 +67,8 @@ kern_return_t AIC8800_NetIf::SetHardwareAddress(const IOEthernetAddress *addr)
     if (!addr) return kIOReturnBadArgument;
 
     // Set MAC address in driver data
-    AIC8800_DriverData *driver = (AIC8800_DriverData *)GetProvider()->getProvider();
+    AIC8800_DriverData *driver = AIC8800_GetDriverData(GetProvider());
+    if (!driver) return kIOReturnNotReady;
 
     memcpy(driver->config.mac_address, addr->bytes, AIC8800_ETH_ALEN);
 
@@ -94,7 +103,8 @@ kern_return_t AIC8800_NetIf::GetPacketFilters(uint32_t *filters)
 kern_return_t AIC8800_NetIf::SetPacketFilters(uint32_t filters)
 {
     // Configure MAC filter register
-    AIC8800_DriverData *driver = (AIC8800_DriverData *)GetProvider()->getProvider();
+    AIC8800_DriverData *driver = AIC8800_GetDriverData(GetProvider());
+    if (!driver) return kIOReturnNotReady;
 
     uint32_t reg_value = 0;
 
@@ -212,7 +222,8 @@ kern_return_t AIC8800_NetIf::InputPacket(const uint8_t *data, uint32_t length)
 
 kern_return_t AIC8800_NetIf::SetPowerState(uint32_t powerState)
 {
-    AIC8800_DriverData *driver = (AIC8800_DriverData *)GetProvider()->getProvider();
+    AIC8800_DriverData *driver = AIC8800_GetDriverData(GetProvider());
+    if (!driver) return kIOReturnNotReady;
 
     IOLog("AIC8800: Setting power state %u\n", powerState);
 
@@ -255,7 +266,8 @@ kern_return_t AIC8800_NetIf::SetPowerState(uint32_t powerState)
 kern_return_t AIC8800_NetIf::StartScan(const uint8_t *ssid, uint8_t ssid_len,
                                         uint8_t channel)
 {
-    AIC8800_DriverData *driver = (AIC8800_DriverData *)GetProvider()->getProvider();
+    AIC8800_DriverData *driver = AIC8800_GetDriverData(GetProvider());
+    if (!driver) return kIOReturnNotReady;
 
     IOLog("AIC8800: Starting scan (channel %d)\n", channel);
 
@@ -292,7 +304,8 @@ kern_return_t AIC8800_NetIf::StartScan(const uint8_t *ssid, uint8_t ssid_len,
 kern_return_t AIC8800_NetIf::GetScanResults(void *buffer, uint32_t buffer_size,
                                              uint32_t *result_count)
 {
-    AIC8800_DriverData *driver = (AIC8800_DriverData *)GetProvider()->getProvider();
+    AIC8800_DriverData *driver = AIC8800_GetDriverData(GetProvider());
+    if (!driver) return kIOReturnNotReady;
 
     if (!buffer || !result_count) return kIOReturnBadArgument;
 
@@ -323,7 +336,8 @@ kern_return_t AIC8800_NetIf::Associate(const uint8_t *bssid, const uint8_t *ssid
                                         uint8_t ssid_len, const uint8_t *key,
                                         uint32_t key_len)
 {
-    AIC8800_DriverData *driver = (AIC8800_DriverData *)GetProvider()->getProvider();
+    AIC8800_DriverData *driver = AIC8800_GetDriverData(GetProvider());
+    if (!driver) return kIOReturnNotReady;
 
     IOLog("AIC8800: Associating to %s\n", ssid);
 
@@ -374,7 +388,8 @@ kern_return_t AIC8800_NetIf::Associate(const uint8_t *bssid, const uint8_t *ssid
 
 kern_return_t AIC8800_NetIf::Disassociate(void)
 {
-    AIC8800_DriverData *driver = (AIC8800_DriverData *)GetProvider()->getProvider();
+    AIC8800_DriverData *driver = AIC8800_GetDriverData(GetProvider());
+    if (!driver) return kIOReturnNotReady;
 
     IOLog("AIC8800: Disassociating\n");
 
@@ -395,12 +410,13 @@ kern_return_t AIC8800_NetIf::GetLinkStatus(uint32_t *status)
 {
     if (!status) return kIOReturnBadArgument;
 
-    AIC8800_DriverData *driver = (AIC8800_DriverData *)GetProvider()->getProvider();
+    AIC8800_DriverData *driver = AIC8800_GetDriverData(GetProvider());
+    if (!driver) return kIOReturnNotReady;
 
     if (driver->state == AIC8800_STATE_CONNECTED) {
-        *status = kIONetworkLinkActive;
+        *status = 0x01;
     } else {
-        *status = kIONetworkLinkDown;
+        *status = 0x00;
     }
 
     return kIOReturnSuccess;
@@ -410,7 +426,8 @@ kern_return_t AIC8800_NetIf::GetSignalQuality(int8_t *quality)
 {
     if (!quality) return kIOReturnBadArgument;
 
-    AIC8800_DriverData *driver = (AIC8800_DriverData *)GetProvider()->getProvider();
+    AIC8800_DriverData *driver = AIC8800_GetDriverData(GetProvider());
+    if (!driver) return kIOReturnNotReady;
 
     // Read signal quality from hardware
     uint32_t reg_value;

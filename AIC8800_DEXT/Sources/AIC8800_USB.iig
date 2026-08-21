@@ -18,6 +18,15 @@
 
 interface AIC8800_USB : IOUSBHostDevice
 {
+    struct AIC8800_DriverData *driver_data;
+
+    IOUSBHostDevice *usb_device;
+    IOUSBHostInterface *usb_interface;
+    IOUSBHostPipe *bulk_in_pipe;
+    IOUSBHostPipe *bulk_out_pipe;
+    IOUSBHostPipe *interrupt_pipe;
+    uint8_t interface_number;
+
     // USB Lifecycle
     kern_return_t Start(IOService *provider) override;
     kern_return_t Stop(IOService *provider) override;
@@ -25,7 +34,7 @@ interface AIC8800_USB : IOUSBHostDevice
 
     // Device Matching
     bool InitwithDevice(IOUSBHostDevice *device,
-                        IOUSBHostInterface *interface);
+                         IOUSBHostInterface *interface);
 
     // Register I/O
     kern_return_t ReadRegister(uint16_t address, uint32_t *value);

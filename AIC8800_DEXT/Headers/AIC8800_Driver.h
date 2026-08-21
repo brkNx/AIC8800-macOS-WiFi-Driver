@@ -162,7 +162,7 @@ static const uint8_t AIC8800_MODE_SWITCH_CDB[AIC8800_MODE_SWITCH_CDB_LEN] = {
 #define AIC8800_MGMT_SUBTYPE_PROBE_REQ    0x04
 #define AIC8800_MGMT_SUBTYPE_PROBE_RESP   0x05
 #define AIC8800_MGMT_SUBTYPE_BEACON       0x08
-#define AIC8800_MGMT_SUBTYPE_ATIM         0x05
+#define AIC8800_MGMT_SUBTYPE_ATIM         0x09
 #define AIC8800_MGMT_SUBTYPE_DISASSOC     0x0A
 #define AIC8800_MGMT_SUBTYPE_AUTH         0x0B
 #define AIC8800_MGMT_SUBTYPE_DEAUTH       0x0C
@@ -281,6 +281,7 @@ struct AIC8800_ScanResult {
 
 struct AIC8800_DriverData {
     // USB
+    class AIC8800_USB *usb_driver;
     IOUSBHostDevice *usb_device;
     IOUSBHostInterface *usb_interface;
     IOUSBHostPipe *bulk_in_pipe;
@@ -317,4 +318,43 @@ struct AIC8800_DriverData {
     IOLock *lock;
 };
 
-#endif /* AIC8800_DRIVER_H */
+#ifdef __cplusplus
+extern "C" {
+#endif
+
+kern_return_t AIC8800_HALInit(struct AIC8800_DriverData *driver);
+kern_return_t AIC8800_PowerOn(struct AIC8800_DriverData *driver);
+kern_return_t AIC8800_MACInit(struct AIC8800_DriverData *driver);
+kern_return_t AIC8800_PHYInit(struct AIC8800_DriverData *driver);
+kern_return_t AIC8800_RFCalibration(struct AIC8800_DriverData *driver);
+kern_return_t AIC8800_SetMACAddress(struct AIC8800_DriverData *driver,
+                                     const uint8_t *mac_addr);
+kern_return_t AIC8800_SetChannel(struct AIC8800_DriverData *driver,
+                                  uint8_t channel);
+kern_return_t AIC8800_SetBand(struct AIC8800_DriverData *driver, uint8_t band);
+kern_return_t AIC8800_SetTxPower(struct AIC8800_DriverData *driver,
+                                  uint16_t power_dbm);
+
+kern_return_t AIC8800_HandleManagementFrame(const uint8_t *data,
+                                             uint32_t length);
+kern_return_t AIC8800_SendProbeRequest(struct AIC8800_DriverData *driver,
+                                        const uint8_t *ssid,
+                                        uint8_t ssid_len);
+kern_return_t AIC8800_SendAuthFrame(struct AIC8800_DriverData *driver,
+                                     const uint8_t *bssid,
+                                     const uint8_t *ssid,
+                                     uint8_t ssid_len);
+kern_return_t AIC8800_SendAssocFrame(struct AIC8800_DriverData *driver,
+                                      const uint8_t *bssid,
+                                      const uint8_t *ssid,
+                                      uint8_t ssid_len);
+kern_return_t AIC8800_SendDeauthFrame(struct AIC8800_DriverData *driver);
+kern_return_t AIC8800_InstallKeys(struct AIC8800_DriverData *driver,
+                                   const uint8_t *key,
+                                   uint32_t key_len);
+
+#ifdef __cplusplus
+}
+#endif
+
+#endif

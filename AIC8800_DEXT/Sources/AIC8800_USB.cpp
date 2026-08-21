@@ -96,20 +96,22 @@ kern_return_t AIC8800_USB::Free()
 {
     IOLog("AIC8800: Freeing driver resources\n");
 
-    // Free buffers
-    if (tx_buffer) {
-        tx_buffer->Release();
-        tx_buffer = nullptr;
+    if (driver_data->tx_buffer) {
+        driver_data->tx_buffer->Release();
+        driver_data->tx_buffer = nullptr;
     }
-    if (rx_buffer) {
-        rx_buffer->Release();
-        rx_buffer = nullptr;
+    if (driver_data->rx_buffer) {
+        driver_data->rx_buffer->Release();
+        driver_data->rx_buffer = nullptr;
     }
 
-    // Free lock
-    if (lock) {
-        IOLockFree(lock);
-        lock = nullptr;
+    if (driver_data) {
+        if (driver_data->lock) {
+            IOLockFree(driver_data->lock);
+            driver_data->lock = nullptr;
+        }
+        IOFree(driver_data, sizeof(struct AIC8800_DriverData));
+        driver_data = nullptr;
     }
 
     return IOUSBHostDevice::Free();
@@ -124,9 +126,17 @@ kern_return_t AIC8800_USB::InitwithDevice(IOUSBHostDevice *device,
 {
     kern_return_t result;
 
+    driver_data = (struct AIC8800_DriverData *)IOMalloc(sizeof(struct AIC8800_DriverData));
+    if (!driver_data) {
+        IOLog("AIC8800: Failed to allocate driver data\n");
+        return kIOReturnNoMemory;
+    }
+    memset(driver_data, 0, sizeof(struct AIC8800_DriverData));
+    driver_data->usb_driver = this;
+
     // Create synchronization lock
-    lock = IOLockAlloc();
-    if (!lock) {
+    driver_data->lock = IOLockAlloc();
+    if (!driver_data->lock) {
         IOLog("AIC8800: Failed to allocate lock\n");
         return kIOReturnNoMemory;
     }
@@ -166,30 +176,29 @@ kern_return_t AIC8800_USB::InitwithDevice(IOUSBHostDevice *device,
     }
 
     // Allocate TX/RX buffers
-    tx_buffer = IOBufferMemoryDescriptor::withBytes(nullptr,
+    driver_data->tx_buffer = IOBufferMemoryDescriptor::withBytes(nullptr,
         AIC8800_TX_DESC_SIZE * AIC8800_MAX_TX_QUEUES,
         kIODirectionOut, false);
-    if (!tx_buffer) {
+    if (!driver_data->tx_buffer) {
         IOLog("AIC8800: Failed to allocate TX buffer\n");
         return kIOReturnNoMemory;
     }
 
-    rx_buffer = IOBufferMemoryDescriptor::withBytes(nullptr,
+    driver_data->rx_buffer = IOBufferMemoryDescriptor::withBytes(nullptr,
         AIC8800_RX_DESC_SIZE * 32,
         kIODirectionIn, false);
-    if (!rx_buffer) {
+    if (!driver_data->rx_buffer) {
         IOLog("AIC8800: Failed to allocate RX buffer\n");
         return kIOReturnNoMemory;
     }
 
     // Map buffer addresses
-    tx_desc_ring = (uint8_t *)tx_buffer->getBytesNoCopy();
-    rx_desc_ring = (uint8_t *)rx_buffer->getBytesNoCopy();
+    driver_data->tx_desc_ring = (uint8_t *)driver_data->tx_buffer->getBytesNoCopy();
+    driver_data->rx_desc_ring = (uint8_t *)driver_data->rx_buffer->getBytesNoCopy();
 
-    // Initialize state
-    state = AIC8800_STATE_IDLE;
-    firmware_loaded = false;
-    interface_active = false;
+    driver_data->state = AIC8800_STATE_IDLE;
+    driver_data->firmware_loaded = false;
+    driver_data->interface_active = false;
 
     IOLog("AIC8800: Driver data initialized\n");
     return kIOReturnSuccess;
@@ -201,9 +210,9 @@ kern_return_t AIC8800_USB::InitwithDevice(IOUSBHostDevice *device,
 
 kern_return_t AIC8800_USB::ReadRegister(uint16_t address, uint32_t *value)
 {
-    if (!value) return kIOReturnBadArgument;
+    if (!value || !driver_data || !driver_data->lock) return kIOReturnBadArgument;
 
-    IOLockLock(lock);
+    IOLockLock(driver_data->lock);
 
     uint32_t data = 0;
     kern_return_t result = SendControlTransfer(
@@ -219,13 +228,15 @@ kern_return_t AIC8800_USB::ReadRegister(uint16_t address, uint32_t *value)
         *value = data;
     }
 
-    IOLockUnlock(lock);
+    IOLockUnlock(driver_data->lock);
     return result;
 }
 
 kern_return_t AIC8800_USB::WriteRegister(uint16_t address, uint32_t value)
 {
-    IOLockLock(lock);
+    if (!driver_data || !driver_data->lock) return kIOReturnBadArgument;
+
+    IOLockLock(driver_data->lock);
 
     kern_return_t result = SendControlTransfer(
         AIC8800_USB_REQ_WRITE_REG,
@@ -236,16 +247,16 @@ kern_return_t AIC8800_USB::WriteRegister(uint16_t address, uint32_t value)
         false
     );
 
-    IOLockUnlock(lock);
+    IOLockUnlock(driver_data->lock);
     return result;
 }
 
 kern_return_t AIC8800_USB::ReadMemory(uint16_t address, void *buffer,
                                        uint32_t length)
 {
-    if (!buffer || length == 0) return kIOReturnBadArgument;
+    if (!buffer || length == 0 || !driver_data || !driver_data->lock) return kIOReturnBadArgument;
 
-    IOLockLock(lock);
+    IOLockLock(driver_data->lock);
 
     kern_return_t result = SendControlTransfer(
         AIC8800_USB_REQ_READ_MEM,
@@ -256,16 +267,16 @@ kern_return_t AIC8800_USB::ReadMemory(uint16_t address, void *buffer,
         true
     );
 
-    IOLockUnlock(lock);
+    IOLockUnlock(driver_data->lock);
     return result;
 }
 
 kern_return_t AIC8800_USB::WriteMemory(uint16_t address, const void *buffer,
                                         uint32_t length)
 {
-    if (!buffer || length == 0) return kIOReturnBadArgument;
+    if (!buffer || length == 0 || !driver_data || !driver_data->lock) return kIOReturnBadArgument;
 
-    IOLockLock(lock);
+    IOLockLock(driver_data->lock);
 
     kern_return_t result = SendControlTransfer(
         AIC8800_USB_REQ_WRITE_MEM,
@@ -276,7 +287,7 @@ kern_return_t AIC8800_USB::WriteMemory(uint16_t address, const void *buffer,
         false
     );
 
-    IOLockUnlock(lock);
+    IOLockUnlock(driver_data->lock);
     return result;
 }
 
@@ -334,9 +345,9 @@ kern_return_t AIC8800_USB::SendControlTransfer(uint8_t request,
 kern_return_t AIC8800_USB::LoadFirmware(const uint8_t *data, uint32_t length)
 {
     if (!data || length == 0) return kIOReturnBadArgument;
-    if (state != AIC8800_STATE_FIRMWARE_LOADING) {
+    if (driver_data->state != AIC8800_STATE_FIRMWARE_LOADING) {
         IOLog("AIC8800: Invalid state for firmware load\n");
-        return kIOReturnIllegalCommand;
+        return kIOReturnNotPermitted;
     }
 
     IOLog("AIC8800: Loading firmware (%u bytes)\n", length);
@@ -384,8 +395,8 @@ kern_return_t AIC8800_USB::LoadFirmware(const uint8_t *data, uint32_t length)
     );
 
     if (result == kIOReturnSuccess) {
-        firmware_loaded = true;
-        state = AIC8800_STATE_READY;
+        driver_data->firmware_loaded = true;
+        driver_data->state = AIC8800_STATE_READY;
         IOLog("AIC8800: Firmware loaded successfully\n");
     }
 
@@ -586,10 +597,23 @@ kern_return_t AIC8800_USB::HandleInterrupt(void)
     if (!interrupt_pipe) return kIOReturnNotReady;
 
     uint8_t interrupt_data[8];
-    uint32_t actual_length;
+    uint32_t actual_length = 0;
 
-    kern_return_t result = ReceiveData(interrupt_data, sizeof(interrupt_data),
-                                        &actual_length);
+    IOBufferMemoryDescriptor *mem_desc = IOBufferMemoryDescriptor::withBytes(
+        interrupt_data, sizeof(interrupt_data), kIODirectionIn, false);
+    if (!mem_desc) return kIOReturnNoMemory;
+
+    IOUSBHostCompletion completion;
+    kern_return_t result = interrupt_pipe->Read(
+        &completion,
+        mem_desc,
+        sizeof(interrupt_data),
+        &actual_length,
+        5000
+    );
+
+    mem_desc->Release();
+
     if (result != kIOReturnSuccess) {
         return result;
     }
