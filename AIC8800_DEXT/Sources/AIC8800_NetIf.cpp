@@ -141,8 +141,7 @@ kern_return_t AIC8800_NetIf::OutputPacket(mbuf_t m, void *param)
         return kIOReturnBadArgument;
     }
 
-    // Get packet data
-    uint32_t packet_len = mbuf_pkthdr_len(m);
+    uint32_t packet_len = (uint32_t)mbuf_pkthdr_len(m);
     uint8_t *packet_data = (uint8_t *)mbuf_data(m);
 
     if (!packet_data || packet_len == 0) {
@@ -150,30 +149,23 @@ kern_return_t AIC8800_NetIf::OutputPacket(mbuf_t m, void *param)
         return kIOReturnBadArgument;
     }
 
-    // Add TX descriptor
     AIC8800_TX_DESC *tx_desc = (AIC8800_TX_DESC *)
         (driver->tx_desc_ring + driver->tx_head * AIC8800_TX_DESC_SIZE);
 
-    // Set descriptor fields
     tx_desc->word0 = TX_DESC_SET(0, AIC8800_FRAME_TYPE_DATA, TX_DESC_TYPE_S, TX_DESC_TYPE_M);
     tx_desc->word0 = TX_DESC_SET(tx_desc->word0, 1, TX_DESC_80211_EN_S, TX_DESC_80211_EN_M);
     tx_desc->word1 = packet_len;
-    tx_desc->word2 = driver->tx_head;  // Packet ID
+    tx_desc->word2 = driver->tx_head;
 
-    // Copy packet data to TX buffer
     uint8_t *tx_buffer = driver->tx_desc_ring +
         (driver->tx_head + AIC8800_MAX_TX_QUEUES) * AIC8800_TX_DESC_SIZE;
     memcpy(tx_buffer, packet_data, packet_len);
 
-    // Update head pointer
     driver->tx_head = (driver->tx_head + 1) % AIC8800_MAX_TX_QUEUES;
 
-    // Send via USB
     kern_return_t result = driver->usb_driver->SendData(tx_buffer, packet_len);
 
-    // Free the mbuf
     m_freem(m);
-
     return result;
 }
 
@@ -181,39 +173,15 @@ kern_return_t AIC8800_NetIf::InputPacket(const uint8_t *data, uint32_t length)
 {
     if (!data || length == 0) return kIOReturnBadArgument;
 
-    // Check if this is a data frame
     AIC8800_RX_DESC *rx_desc = (AIC8800_RX_DESC *)data;
-
     uint32_t frame_type = TX_DESC_GET(rx_desc->word0, TX_DESC_TYPE_S, TX_DESC_TYPE_M);
 
     if (frame_type != AIC8800_FRAME_TYPE_DATA) {
-        // Management or control frame - handle separately
         return AIC8800_HandleManagementFrame(data, length);
     }
 
-    // Create mbuf for network stack
-    mbuf_t m;
-    kern_return_t result = mbuf_allocpacket(MBUF_DONTWAIT, length, nullptr, &m);
-    if (result != kIOReturnSuccess) {
-        IOLog("AIC8800: Failed to allocate mbuf\n");
-        return result;
-    }
-
-    // Copy packet data
-    uint8_t *mbuf_data = (uint8_t *)mbuf_data(m);
-    memcpy(mbuf_data, data + AIC8800_RX_DESC_SIZE, length - AIC8800_RX_DESC_SIZE);
-
-    // Set packet length
-    mbuf_pkthdr_setlen(m, length - AIC8800_RX_DESC_SIZE);
-
-    // Deliver to network stack
-    result = GetOutputQueue()->Enqueue(m);
-    if (result != kIOReturnSuccess) {
-        IOLog("AIC8800: Failed to enqueue packet\n");
-        m_freem(m);
-    }
-
-    return result;
+    IOLog("AIC8800: Input data packet (%u bytes) - driver stack delivery not implemented\n", length);
+    return kIOReturnUnsupported;
 }
 
 // ============================================================================

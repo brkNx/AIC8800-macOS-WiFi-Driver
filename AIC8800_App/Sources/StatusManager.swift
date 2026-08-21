@@ -184,17 +184,9 @@ class StatusManager: ObservableObject {
         appendLog("Starting driver installation...")
         driverStatus = .installing
 
-        // Get the DEXT bundle path
-        guard let dextURL = Bundle.main.url(forResource: "AIC8800_DEXT", withExtension: "dext") else {
-            appendLog("ERROR: DEXT bundle not found")
-            driverStatus = .error("DEXT bundle not found")
-            return
-        }
-
-        // Request system extension activation
         let request = OSSystemExtensionRequest(
-            activationRequestForExtension: dextURL,
-            queue: .main
+            activationRequest(forExtensionWithIdentifier: "com.aic8800.wifi.dext",
+                              queue: .main)
         )
         request.delegate = self
 
@@ -205,18 +197,9 @@ class StatusManager: ObservableObject {
     func uninstallDriver() {
         appendLog("Starting driver uninstallation...")
 
-        // Get the DEXT bundle identifier
-        guard let bundleID = Bundle.main.bundleIdentifier else {
-            appendLog("ERROR: Cannot get bundle identifier")
-            return
-        }
-
-        let dextBundleID = bundleID + ".DEXT"
-
-        // Request system extension deactivation
         let request = OSSystemExtensionRequest(
-            deactivationRequestForExtension: dextBundleID,
-            queue: .main
+            deactivationRequest(forExtensionWithIdentifier: "com.aic8800.wifi.dext",
+                                queue: .main)
         )
         request.delegate = self
 
@@ -293,15 +276,11 @@ class StatusManager: ObservableObject {
 extension StatusManager: OSSystemExtensionRequestDelegate {
     func request(
         _ request: OSSystemExtensionRequest,
-        actionForExtensionExtensionProperties extensionProperties: [String: Any] beforeExtensionActivation before: Bool
+        actionForExtension extensionProperties: [String: Any],
+        beforeExtensionActivation before: Bool
     ) -> OSSystemExtensionRequest.ExtensionAction {
-        if before {
-            appendLog("Extension already installed, will replace")
-            return .replace
-        } else {
-            appendLog("Installing new extension")
-            return .replace
-        }
+        appendLog("Extension action requested (before activation: \(before))")
+        return .replace
     }
 
     func request(_ request: OSSystemExtensionRequest, didFinishWithResult result: OSSystemExtensionRequest.Result) {
