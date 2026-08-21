@@ -103,6 +103,30 @@
 
 ---
 
+## Current Status
+
+> ⚠️ **Development Status**: This driver is a work-in-progress skeleton. The core architecture is in place but it has not been tested on real hardware and several components need completion.
+
+### What Works
+
+- ✅ Project structure and DriverKit skeleton
+- ✅ USB device matching definitions
+- ✅ User client for app-to-driver communication
+- ✅ Companion app UI
+- ✅ HAL initialization framework
+- ✅ 802.11 frame builders (probe request, auth, assoc, deauth)
+
+### What Needs Work
+
+- 🔄 Firmware loading sequence (needs real firmware files)
+- 🔄 USB control transfer completion handling (async synchronization)
+- 🔄 Mode switch from mass-storage mode (requires companion app or udev-like mechanism)
+- 🔄 RX data path to macOS network stack
+- 🔄 WPA2/WPA3 4-way handshake
+- 🔄 Bluetooth support (AIC8800 has integrated BT)
+
+---
+
 ## Quick Start
 
 ### 1. Clone & Build
@@ -204,12 +228,14 @@ AIC8800-macOS-WiFi-Driver/
 │   │   ├── AIC8800_USB.cpp      # USB lifecycle & matching
 │   │   ├── AIC8800_HALInit.cpp  # Power-on & calibration
 │   │   ├── AIC8800_NetIf.cpp    # Network interface
+│   │   ├── AIC8800_UserClient.cpp # App-to-driver communication
 │   │   ├── AIC8800_USB.iig      # USB interface definition
-│   │   └── AIC8800_NetIf.iig    # Network interface definition
+│   │   ├── AIC8800_NetIf.iig    # Network interface definition
+│   │   └── AIC8800_UserClient.iig # User client interface
 │   ├── Info.plist
 │   └── AIC8800_DEXT.entitlements
 │
-├── 📦 Firmware/                  # Firmware (not included)
+├── 📦 Firmware/                  # Firmware files (not included)
 │   └── aic8800D80/
 │
 ├── README.md
