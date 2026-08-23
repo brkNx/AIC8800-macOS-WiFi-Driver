@@ -140,7 +140,7 @@ class StatusManager: NSObject, ObservableObject {
     // Device Detection Callback
     // ============================================================================
 
-    private func deviceAdded(_ iterator: io_iterator_t) {
+    func deviceAdded(_ iterator: io_iterator_t) {
         var device = IOIteratorNext(iterator)
         while device != 0 {
             appendLog("AIC8800 device detected!")
