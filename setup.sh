@@ -21,12 +21,12 @@ echo "macOS version: $MACOS_VERSION"
 echo ""
 
 # Verify Xcode project exists
-if [ ! -d "AIC8800WiFi.xcodeproj" ]; then
+if [[ ! -d "AIC8800WiFi.xcodeproj" ]]; then
     echo "ERROR: AIC8800WiFi.xcodeproj not found"
     exit 1
 fi
 
-if [ ! -f "AIC8800WiFi.xcodeproj/project.pbxproj" ]; then
+if [[ ! -f "AIC8800WiFi.xcodeproj/project.pbxproj" ]]; then
     echo "ERROR: project.pbxproj not found"
     exit 1
 fi
