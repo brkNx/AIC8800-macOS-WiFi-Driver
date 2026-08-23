@@ -33,7 +33,7 @@ interface AIC8800_USB : IOUSBHostDevice
     kern_return_t Free() override;
 
     // Device Matching
-    bool InitwithDevice(IOUSBHostDevice *device,
+    kern_return_t InitwithDevice(IOUSBHostDevice *device,
                          IOUSBHostInterface *interface);
 
     // Register I/O

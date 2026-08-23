@@ -7,6 +7,21 @@
 #include "AIC8800_Driver.h"
 #include "AIC8800_USB.iig"
 #include "AIC8800_NetIf.iig"
+#include <libkern/OSByteOrder.h>
+
+// ============================================================================
+// Network Filter Constants (DriverKit compatible)
+// ============================================================================
+#define kIONetworkFilterPromiscuous  0x01
+#define kIONetworkFilterMulticast    0x02
+#define kIONetworkFilterBroadcast    0x04
+
+// ============================================================================
+// Ethernet Address Structure (DriverKit compatible)
+// ============================================================================
+struct IOEthernetAddress {
+    uint8_t bytes[6];
+};
 
 static AIC8800_DriverData *AIC8800_GetDriverData(IOService *provider)
 {
@@ -137,7 +152,6 @@ kern_return_t AIC8800_NetIf::OutputPacket(mbuf_t m, void *param)
     AIC8800_DriverData *driver = (AIC8800_DriverData *)param;
 
     if (!m || !driver) {
-        if (m) m_freem(m);
         return kIOReturnBadArgument;
     }
 
@@ -145,7 +159,6 @@ kern_return_t AIC8800_NetIf::OutputPacket(mbuf_t m, void *param)
     uint8_t *packet_data = (uint8_t *)mbuf_data(m);
 
     if (!packet_data || packet_len == 0) {
-        m_freem(m);
         return kIOReturnBadArgument;
     }
 
@@ -417,7 +430,6 @@ kern_return_t AIC8800_NetIf::GetSignalQuality(int8_t *quality)
 
 kern_return_t AIC8800_HandleManagementFrame(const uint8_t *data, uint32_t length)
 {
-    // Parse management frame header
     struct __attribute__((packed)) {
         uint16_t frame_control;
         uint16_t duration;
@@ -427,7 +439,7 @@ kern_return_t AIC8800_HandleManagementFrame(const uint8_t *data, uint32_t length
         uint16_t seq_ctrl;
     } *mgmt_hdr = (void *)data;
 
-    uint16_t frame_control = ntohs(mgmt_hdr->frame_control);
+    uint16_t frame_control = OSReadSwapInt16(&mgmt_hdr->frame_control, 0);
     uint8_t subtype = (frame_control >> 4) & 0x0F;
 
     switch (subtype) {

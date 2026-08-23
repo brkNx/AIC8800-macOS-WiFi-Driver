@@ -43,7 +43,7 @@
 		000000000000000000000219 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; name = Info.plist; path = AIC8800_DEXT/Info.plist; sourceTree = SOURCE_ROOT; };
 		00000000000000000000021A /* AIC8800_DEXT.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; name = AIC8800_DEXT.entitlements; path = AIC8800_DEXT/AIC8800_DEXT.entitlements; sourceTree = SOURCE_ROOT; };
 		000000000000000000000301 /* AIC8800WiFi.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = AIC8800WiFi.app; sourceTree = BUILT_PRODUCTS_DIR; };
-		000000000000000000000302 /* AIC8800WiFi_DEXT.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = AIC8800WiFi_DEXT.appex; sourceTree = BUILT_PRODUCTS_DIR; };
+		000000000000000000000302 /* AIC8800WiFi_DEXT.dext */ = {isa = PBXFileReference; explicitFileType = "driverkit.driver-extension"; includeInIndex = 0; path = AIC8800WiFi_DEXT.dext; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -106,7 +106,7 @@
 			isa = PBXGroup;
 			children = (
 				000000000000000000000301 /* AIC8800WiFi.app */,
-				000000000000000000000302 /* AIC8800WiFi_DEXT.appex */,
+				000000000000000000000302 /* AIC8800WiFi_DEXT.dext */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -144,8 +144,8 @@
 			);
 			name = AIC8800WiFi_DEXT;
 			productName = AIC8800WiFi_DEXT;
-			productReference = 000000000000000000000302 /* AIC8800WiFi_DEXT.appex */;
-			productType = "com.apple.product-type.app-extension";
+			productReference = 000000000000000000000302 /* AIC8800WiFi_DEXT.dext */;
+			productType = "com.apple.product-type.driverkit";
 		};
 /* End PBXNativeTarget section */
 
@@ -323,6 +323,8 @@
 					"DriverKit",
 					"-framework",
 					"USBDriverKit",
+					"-framework",
+					"NetworkDriverKit",
 				);
 				PRODUCT_BUNDLE_IDENTIFIER = com.aic8800.wifi.dext;
 				PRODUCT_NAME = "$(TARGET_NAME)";
@@ -354,6 +356,8 @@
 					"DriverKit",
 					"-framework",
 					"USBDriverKit",
+					"-framework",
+					"NetworkDriverKit",
 				);
 				PRODUCT_BUNDLE_IDENTIFIER = com.aic8800.wifi.dext;
 				PRODUCT_NAME = "$(TARGET_NAME)";
