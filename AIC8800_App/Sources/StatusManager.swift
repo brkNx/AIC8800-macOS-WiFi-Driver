@@ -9,6 +9,7 @@ import Foundation
 import IOKit
 import IOKit.usb
 import SystemExtensions
+import SwiftUI
 
 // ============================================================================
 // Driver Status
@@ -43,7 +44,7 @@ enum DriverStatus {
 // Status Manager
 // ============================================================================
 
-class StatusManager: ObservableObject {
+class StatusManager: NSObject, ObservableObject {
     static let shared = StatusManager()
 
     // Driver status
@@ -278,7 +279,7 @@ extension StatusManager: OSSystemExtensionRequestDelegate {
         _ request: OSSystemExtensionRequest,
         actionForExtension extensionProperties: [String: Any],
         beforeExtensionActivation before: Bool
-    ) -> OSSystemExtensionRequest.ExtensionAction {
+    ) -> OSSystemExtensionRequest.Action {
         appendLog("Extension action requested (before activation: \(before))")
         return .replace
     }
