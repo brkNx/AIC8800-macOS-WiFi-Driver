@@ -202,9 +202,6 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				000000000000000000000115 /* AIC8800_USB.iig in Sources */,
-				000000000000000000000116 /* AIC8800_NetIf.iig in Sources */,
-				000000000000000000000117 /* AIC8800_UserClient.iig in Sources */,
 				000000000000000000000111 /* AIC8800_USB.cpp in Sources */,
 				000000000000000000000112 /* AIC8800_HALInit.cpp in Sources */,
 				000000000000000000000113 /* AIC8800_NetIf.cpp in Sources */,
