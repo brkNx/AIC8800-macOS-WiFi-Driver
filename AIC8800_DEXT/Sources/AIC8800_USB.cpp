@@ -4,26 +4,7 @@
  * USB Lifecycle and Device Matching Implementation
  */
 
-#include "AIC8800_USB.h"
-
-OSDefineMetaClassAndStructors(AIC8800_USB, IOUSBHostDevice)
-
-kern_return_t AIC8800_USB::Init(OSDictionary *dictionary)
-{
-    kern_return_t result = IOUSBHostDevice::Init(dictionary);
-    if (result != kIOReturnSuccess) {
-        IOLog("AIC8800: Failed to init USB device driver\n");
-        return result;
-    }
-    driver_data = nullptr;
-    usb_device = nullptr;
-    usb_interface = nullptr;
-    bulk_in_pipe = nullptr;
-    bulk_out_pipe = nullptr;
-    interrupt_pipe = nullptr;
-    interface_number = 0;
-    return kIOReturnSuccess;
-}
+#include "AIC8800_USB.iig"
 
 kern_return_t AIC8800_USB::Start(IOService *provider)
 {
@@ -41,19 +22,6 @@ kern_return_t AIC8800_USB::Start(IOService *provider)
     if (!usb_device) {
         IOLog("AIC8800: Provider is not a USB device\n");
         return kIOReturnBadArgument;
-    }
-
-    // Get the first interface
-    result = usb_device->GetFirstInterface(&usb_interface);
-    if (result != kIOReturnSuccess || !usb_interface) {
-        IOLog("AIC8800: Failed to get USB interface\n");
-        return result;
-    }
-
-    // Get interface number
-    const IOUSBHostInterfaceDescriptor *desc = usb_interface->GetInterfaceDescriptor();
-    if (desc) {
-        interface_number = desc->bInterfaceNumber;
     }
 
     // Initialize driver data
@@ -91,7 +59,7 @@ kern_return_t AIC8800_USB::Stop(IOService *provider)
     return IOUSBHostDevice::Stop(provider);
 }
 
-kern_return_t AIC8800_USB::Free()
+void AIC8800_USB::Free()
 {
     IOLog("AIC8800: Freeing driver resources\n");
 
@@ -112,7 +80,7 @@ kern_return_t AIC8800_USB::Free()
         driver_data = nullptr;
     }
 
-    return IOUSBHostDevice::Free();
+    IOUSBHostDevice::Free();
 }
 
 // ============================================================================
@@ -139,20 +107,24 @@ kern_return_t AIC8800_USB::InitwithDevice(IOUSBHostDevice *device,
         return kIOReturnNoMemory;
     }
 
+    usb_interface = iface;
+
     // Get USB endpoints
-    const IOUSBHostEndpointDescriptor *ep_desc;
-    ep_desc = iface->FindNextEndpoint(nullptr, nullptr);
-    while (ep_desc) {
+    const IOUSBHostEndpointDescriptor *ep_desc = nullptr;
+    while (true) {
+        ep_desc = iface->FindNextEndpoint(ep_desc, nullptr);
+        if (!ep_desc) break;
+
         if (ep_desc->bmAttributes == AIC8800_USB_ENDPOINT_BULK) {
             if (ep_desc->bEndpointAddress & 0x80) {
-                result = iface->GetPipeObj(ep_desc->bEndpointAddress,
+                result = iface->CopyPipeObj(ep_desc->bEndpointAddress,
                                            &bulk_in_pipe);
                 if (result != kIOReturnSuccess) {
                     IOLog("AIC8800: Failed to get bulk IN pipe\n");
                     return result;
                 }
             } else {
-                result = iface->GetPipeObj(ep_desc->bEndpointAddress,
+                result = iface->CopyPipeObj(ep_desc->bEndpointAddress,
                                            &bulk_out_pipe);
                 if (result != kIOReturnSuccess) {
                     IOLog("AIC8800: Failed to get bulk OUT pipe\n");
@@ -160,14 +132,13 @@ kern_return_t AIC8800_USB::InitwithDevice(IOUSBHostDevice *device,
                 }
             }
         } else if (ep_desc->bmAttributes == AIC8800_USB_ENDPOINT_INTERRUPT) {
-            result = iface->GetPipeObj(ep_desc->bEndpointAddress,
+            result = iface->CopyPipeObj(ep_desc->bEndpointAddress,
                                        &interrupt_pipe);
             if (result != kIOReturnSuccess) {
                 IOLog("AIC8800: Failed to get interrupt pipe\n");
                 return result;
             }
         }
-        ep_desc = iface->FindNextEndpoint(ep_desc, nullptr);
     }
 
     // Allocate TX/RX buffers
@@ -303,22 +274,15 @@ kern_return_t AIC8800_USB::SendControlTransfer(uint8_t request,
     kern_return_t kr = usb_interface->CopyPipeObj(0, &control_pipe);
     if (kr != kIOReturnSuccess || !control_pipe) return kIOReturnNotReady;
 
-    AIC8800_USB_ControlRequest req;
-    req.bmRequestType = is_in ? AIC8800_REQ_TYPE_IN : AIC8800_REQ_TYPE_OUT;
-    req.bRequest = request;
-    req.wValue = value;
-    req.wIndex = index;
-    req.wLength = length;
-
     IOUSBHostRequest usbReq;
     memset(&usbReq, 0, sizeof(usbReq));
     usbReq.direction = is_in ? kIOUSBHostRequestDirectionIn : kIOUSBHostRequestDirectionOut;
     usbReq.type = kIOUSBHostRequestTypeVendor;
-    usbReq.bmRequestType = req.bmRequestType;
-    usbReq.bRequest = req.bRequest;
-    usbReq.wValue = req.wValue;
-    usbReq.wIndex = req.wIndex;
-    usbReq.wLength = req.wLength;
+    usbReq.bmRequestType = is_in ? AIC8800_REQ_TYPE_IN : AIC8800_REQ_TYPE_OUT;
+    usbReq.bRequest = request;
+    usbReq.wValue = value;
+    usbReq.wIndex = index;
+    usbReq.wLength = length;
     usbReq.data = (uint8_t *)data;
     usbReq.dataLength = length;
     usbReq.completionTimeout = 5000;

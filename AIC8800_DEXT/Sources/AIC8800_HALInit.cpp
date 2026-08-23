@@ -4,7 +4,7 @@
  * HAL Initialization - Power-on, MAC enable, RF calibration
  */
 
-#include "AIC8800_Driver.h"
+#include "AIC8800_USB.iig"
 
 // ============================================================================
 // HAL Initialization Sequence

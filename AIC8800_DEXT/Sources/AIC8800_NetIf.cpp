@@ -4,25 +4,13 @@
  * Network Interface Implementation
  */
 
-#include "AIC8800_NetIf.h"
-#include "AIC8800_USB.h"
-
-OSDefineMetaClassAndStructors(AIC8800_NetIf, IOService)
+#include "AIC8800_NetIf.iig"
+#include "AIC8800_USB.iig"
 
 static AIC8800_DriverData *AIC8800_GetDriverData(IOService *provider)
 {
     AIC8800_USB *usb_driver = OSDynamicCast(AIC8800_USB, provider);
     return usb_driver ? usb_driver->driver_data : nullptr;
-}
-
-kern_return_t AIC8800_NetIf::Init(OSDictionary *dictionary)
-{
-    kern_return_t result = IOService::Init(dictionary);
-    if (result != kIOReturnSuccess) {
-        IOLog("AIC8800: Failed to init network interface\n");
-        return result;
-    }
-    return kIOReturnSuccess;
 }
 
 kern_return_t AIC8800_NetIf::Start(IOService *provider)
@@ -46,46 +34,46 @@ kern_return_t AIC8800_NetIf::Stop(IOService *provider)
     return IOService::Stop(provider);
 }
 
-kern_return_t AIC8800_NetIf::Free()
+void AIC8800_NetIf::Free()
 {
-    return IOService::Free();
+    IOService::Free();
 }
 
 // ============================================================================
 // Hardware Address
 // ============================================================================
 
-kern_return_t AIC8800_NetIf::GetHardwareAddress(AIC8800_EthernetAddress *addr)
+kern_return_t AIC8800_NetIf::GetHardwareAddress(uint8_t *addr)
 {
     if (!addr) return kIOReturnBadArgument;
 
     AIC8800_DriverData *driver = AIC8800_GetDriverData(GetProvider());
     if (!driver) return kIOReturnNotReady;
 
-    memcpy(addr->bytes, driver->config.mac_address, AIC8800_ETH_ALEN);
+    memcpy(addr, driver->config.mac_address, AIC8800_ETH_ALEN);
 
     IOLog("AIC8800: Get hardware address: %02X:%02X:%02X:%02X:%02X:%02X\n",
-          addr->bytes[0], addr->bytes[1], addr->bytes[2],
-          addr->bytes[3], addr->bytes[4], addr->bytes[5]);
+          addr[0], addr[1], addr[2],
+          addr[3], addr[4], addr[5]);
 
     return kIOReturnSuccess;
 }
 
-kern_return_t AIC8800_NetIf::SetHardwareAddress(const AIC8800_EthernetAddress *addr)
+kern_return_t AIC8800_NetIf::SetHardwareAddress(const uint8_t *addr)
 {
     if (!addr) return kIOReturnBadArgument;
 
     AIC8800_DriverData *driver = AIC8800_GetDriverData(GetProvider());
     if (!driver) return kIOReturnNotReady;
 
-    memcpy(driver->config.mac_address, addr->bytes, AIC8800_ETH_ALEN);
+    memcpy(driver->config.mac_address, addr, AIC8800_ETH_ALEN);
 
-    kern_return_t result = AIC8800_SetMACAddress(driver, addr->bytes);
+    kern_return_t result = AIC8800_SetMACAddress(driver, addr);
 
     if (result == kIOReturnSuccess) {
         IOLog("AIC8800: Set hardware address: %02X:%02X:%02X:%02X:%02X:%02X\n",
-              addr->bytes[0], addr->bytes[1], addr->bytes[2],
-              addr->bytes[3], addr->bytes[4], addr->bytes[5]);
+              addr[0], addr[1], addr[2],
+              addr[3], addr[4], addr[5]);
     }
 
     return result;
@@ -675,11 +663,6 @@ kern_return_t AIC8800_InstallKeys(AIC8800_DriverData *driver,
     // Install encryption keys for WPA2/WPA3
     // This is a simplified implementation
     IOLog("AIC8800: Installing encryption keys (%u bytes)\n", key_len);
-
-    // In a real implementation, this would:
-    // 1. Derive PTK from 4-way handshake
-    // 2. Install temporal keys
-    // 3. Configure hardware encryption
 
     return kIOReturnSuccess;
 }

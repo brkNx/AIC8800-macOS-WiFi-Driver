@@ -4,19 +4,8 @@
  * User Client Implementation
  */
 
-#include "AIC8800_UserClient.h"
-#include "AIC8800_USB.h"
-
-OSDefineMetaClassAndStructors(AIC8800_UserClient, IOUserClient)
-
-kern_return_t AIC8800_UserClient::Init(OSDictionary *dictionary)
-{
-    kern_return_t result = IOUserClient::Init(dictionary);
-    if (result != kIOReturnSuccess) {
-        return result;
-    }
-    return kIOReturnSuccess;
-}
+#include "AIC8800_UserClient.iig"
+#include "AIC8800_USB.iig"
 
 kern_return_t AIC8800_UserClient::Start(IOService *provider)
 {
@@ -33,14 +22,14 @@ kern_return_t AIC8800_UserClient::Stop(IOService *provider)
     return IOUserClient::Stop(provider);
 }
 
-kern_return_t AIC8800_UserClient::Free()
+void AIC8800_UserClient::Free()
 {
-    return IOUserClient::Free();
+    IOUserClient::Free();
 }
 
-kern_return_t AIC8800_UserClient::externalMethod(uint32_t selector,
-                                                  IOExternalMethodArguments *arguments,
-                                                  const IOExternalMethodDispatch *dispatch,
+kern_return_t AIC8800_UserClient::ExternalMethod(uint64_t selector,
+                                                  IOUserClientMethodArguments *arguments,
+                                                  const IOUserClientMethodDispatch *dispatch,
                                                   OSObject *target,
                                                   void *reference)
 {
@@ -75,7 +64,6 @@ kern_return_t AIC8800_UserClient::externalMethod(uint32_t selector,
             if (!arguments->structureOutput || !arguments->structureOutputSize) {
                 return kIOReturnBadArgument;
             }
-            uint32_t count = 0;
             uint32_t max_count = *arguments->structureOutputSize / sizeof(struct AIC8800_ScanResult);
             uint32_t copy_count = driver->scan_count;
             if (copy_count > max_count) copy_count = max_count;

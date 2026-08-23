@@ -5,9 +5,6 @@
  * This file defines the DriverKit interface for AIC8800 USB WiFi driver.
  */
 
-#ifndef AIC8800_USB_IIG
-#define AIC8800_USB_IIG
-
 #include <DriverKit/IOTypes.h>
 #include <USBDriverKit/IOUSBHostDevice.h>
 #include <USBDriverKit/IOUSBHostInterface.h>
@@ -30,11 +27,11 @@ interface AIC8800_USB : IOUSBHostDevice
     // USB Lifecycle
     kern_return_t Start(IOService *provider) override;
     kern_return_t Stop(IOService *provider) override;
-    kern_return_t Free() override;
+    void Free() override;
 
     // Device Matching
     kern_return_t InitwithDevice(IOUSBHostDevice *device,
-                         IOUSBHostInterface *interface);
+                         IOUSBHostInterface *usbInterface);
 
     // Register I/O
     kern_return_t ReadRegister(uint16_t address, uint32_t *value);
@@ -90,5 +87,3 @@ struct AIC8800_USB_BulkHeader {
     uint16_t sequence;
     uint16_t reserved;
 } __attribute__((packed));
-
-#endif /* AIC8800_USB_IIG */

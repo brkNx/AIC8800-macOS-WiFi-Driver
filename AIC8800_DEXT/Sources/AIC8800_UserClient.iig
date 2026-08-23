@@ -5,23 +5,21 @@
  * Allows companion app to communicate with the driver extension.
  */
 
-#ifndef AIC8800_USERCLIENT_IIG
-#define AIC8800_USERCLIENT_IIG
-
 #include <DriverKit/IOTypes.h>
+#include <DriverKit/IOService.h>
 #include <DriverKit/IOUserClient.h>
 
 interface AIC8800_UserClient : IOUserClient
 {
     kern_return_t Start(IOService *provider) override;
     kern_return_t Stop(IOService *provider) override;
-    kern_return_t Free() override;
+    void Free() override;
 
-    kern_return_t ExternalMethod(uint32_t selector,
-                                  IOUserClientMethodArguments *arguments,
-                                  const IOUserClientMethodDispatch *dispatch,
-                                  OSObject *target,
-                                  void *reference) override;
+    kern_return_t ExternalMethod(uint64_t selector,
+                                 IOUserClientMethodArguments *arguments,
+                                 const IOUserClientMethodDispatch *dispatch,
+                                 OSObject *target,
+                                 void *reference) override;
 
     kern_return_t GetDriverStatus(uint32_t *state, uint32_t *firmware_loaded);
     kern_return_t StartScan(const uint8_t *ssid, uint8_t ssid_len,
@@ -42,5 +40,3 @@ interface AIC8800_UserClient : IOUserClient
 #define AIC8800_USERCLIENT_DISCONNECT       4
 #define AIC8800_USERCLIENT_GET_SIGNAL       5
 #define AIC8800_USERCLIENT_METHOD_COUNT     6
-
-#endif
