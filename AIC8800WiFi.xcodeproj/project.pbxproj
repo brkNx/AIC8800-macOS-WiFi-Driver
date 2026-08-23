@@ -145,7 +145,7 @@
 			name = AIC8800WiFi_DEXT;
 			productName = AIC8800WiFi_DEXT;
 			productReference = 000000000000000000000302 /* AIC8800WiFi_DEXT.dext */;
-			productType = "com.apple.product-type.driverkit-extension";
+			productType = "com.apple.product-type.driver-extension";
 		};
 /* End PBXNativeTarget section */
 
