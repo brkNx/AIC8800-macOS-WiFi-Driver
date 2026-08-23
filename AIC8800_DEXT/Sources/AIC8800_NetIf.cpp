@@ -4,41 +4,32 @@
  * Network Interface Implementation
  */
 
-#include "AIC8800_Driver.h"
-#include "AIC8800_USB.iig"
-#include "AIC8800_NetIf.iig"
-#include <libkern/OSByteOrder.h>
+#include "AIC8800_NetIf.h"
+#include "AIC8800_USB.h"
 
-// ============================================================================
-// Network Filter Constants (DriverKit compatible)
-// ============================================================================
-#define kIONetworkFilterPromiscuous  0x01
-#define kIONetworkFilterMulticast    0x02
-#define kIONetworkFilterBroadcast    0x04
-
-// ============================================================================
-// Ethernet Address Structure (DriverKit compatible)
-// ============================================================================
-struct IOEthernetAddress {
-    uint8_t bytes[6];
-};
+OSDefineMetaClassAndStructors(AIC8800_NetIf, IOService)
 
 static AIC8800_DriverData *AIC8800_GetDriverData(IOService *provider)
 {
-    AIC8800_USB *usb_driver = (AIC8800_USB *)provider;
+    AIC8800_USB *usb_driver = OSDynamicCast(AIC8800_USB, provider);
     return usb_driver ? usb_driver->driver_data : nullptr;
 }
 
-// ============================================================================
-// Network Interface Lifecycle
-// ============================================================================
+kern_return_t AIC8800_NetIf::Init(OSDictionary *dictionary)
+{
+    kern_return_t result = IOService::Init(dictionary);
+    if (result != kIOReturnSuccess) {
+        IOLog("AIC8800: Failed to init network interface\n");
+        return result;
+    }
+    return kIOReturnSuccess;
+}
 
 kern_return_t AIC8800_NetIf::Start(IOService *provider)
 {
     kern_return_t result;
 
-    // Call super
-    result = IOUserNetworkEthernet::Start(provider);
+    result = IOService::Start(provider);
     if (result != kIOReturnSuccess) {
         IOLog("AIC8800: Failed to start network interface\n");
         return result;
@@ -52,22 +43,25 @@ kern_return_t AIC8800_NetIf::Stop(IOService *provider)
 {
     IOLog("AIC8800: Stopping network interface\n");
 
-    return IOUserNetworkEthernet::Stop(provider);
+    return IOService::Stop(provider);
+}
+
+kern_return_t AIC8800_NetIf::Free()
+{
+    return IOService::Free();
 }
 
 // ============================================================================
 // Hardware Address
 // ============================================================================
 
-kern_return_t AIC8800_NetIf::GetHardwareAddress(IOEthernetAddress *addr)
+kern_return_t AIC8800_NetIf::GetHardwareAddress(AIC8800_EthernetAddress *addr)
 {
     if (!addr) return kIOReturnBadArgument;
 
-    // Get MAC address from driver data
     AIC8800_DriverData *driver = AIC8800_GetDriverData(GetProvider());
     if (!driver) return kIOReturnNotReady;
 
-    // Copy MAC address
     memcpy(addr->bytes, driver->config.mac_address, AIC8800_ETH_ALEN);
 
     IOLog("AIC8800: Get hardware address: %02X:%02X:%02X:%02X:%02X:%02X\n",
@@ -77,17 +71,15 @@ kern_return_t AIC8800_NetIf::GetHardwareAddress(IOEthernetAddress *addr)
     return kIOReturnSuccess;
 }
 
-kern_return_t AIC8800_NetIf::SetHardwareAddress(const IOEthernetAddress *addr)
+kern_return_t AIC8800_NetIf::SetHardwareAddress(const AIC8800_EthernetAddress *addr)
 {
     if (!addr) return kIOReturnBadArgument;
 
-    // Set MAC address in driver data
     AIC8800_DriverData *driver = AIC8800_GetDriverData(GetProvider());
     if (!driver) return kIOReturnNotReady;
 
     memcpy(driver->config.mac_address, addr->bytes, AIC8800_ETH_ALEN);
 
-    // Update hardware
     kern_return_t result = AIC8800_SetMACAddress(driver, addr->bytes);
 
     if (result == kIOReturnSuccess) {
@@ -107,29 +99,25 @@ kern_return_t AIC8800_NetIf::GetPacketFilters(uint32_t *filters)
 {
     if (!filters) return kIOReturnBadArgument;
 
-    // Supported filters
-    *filters = kIONetworkFilterPromiscuous |
-               kIONetworkFilterMulticast |
-               kIONetworkFilterBroadcast;
+    *filters = 0x01 | 0x02 | 0x04;
 
     return kIOReturnSuccess;
 }
 
 kern_return_t AIC8800_NetIf::SetPacketFilters(uint32_t filters)
 {
-    // Configure MAC filter register
     AIC8800_DriverData *driver = AIC8800_GetDriverData(GetProvider());
     if (!driver) return kIOReturnNotReady;
 
     uint32_t reg_value = 0;
 
-    if (filters & kIONetworkFilterPromiscuous) {
+    if (filters & 0x01) {
         reg_value |= 0x01;
     }
-    if (filters & kIONetworkFilterMulticast) {
+    if (filters & 0x02) {
         reg_value |= 0x02;
     }
-    if (filters & kIONetworkFilterBroadcast) {
+    if (filters & 0x04) {
         reg_value |= 0x04;
     }
 
@@ -147,39 +135,12 @@ kern_return_t AIC8800_NetIf::SetPacketFilters(uint32_t filters)
 // Data Path
 // ============================================================================
 
-kern_return_t AIC8800_NetIf::OutputPacket(mbuf_t m, void *param)
+kern_return_t AIC8800_NetIf::OutputPacket(void *data, uint32_t length, void *param)
 {
-    AIC8800_DriverData *driver = (AIC8800_DriverData *)param;
-
-    if (!m || !driver) {
-        return kIOReturnBadArgument;
-    }
-
-    uint32_t packet_len = (uint32_t)mbuf_pkthdr_len(m);
-    uint8_t *packet_data = (uint8_t *)mbuf_data(m);
-
-    if (!packet_data || packet_len == 0) {
-        return kIOReturnBadArgument;
-    }
-
-    AIC8800_TX_DESC *tx_desc = (AIC8800_TX_DESC *)
-        (driver->tx_desc_ring + driver->tx_head * AIC8800_TX_DESC_SIZE);
-
-    tx_desc->word0 = TX_DESC_SET(0, AIC8800_FRAME_TYPE_DATA, TX_DESC_TYPE_S, TX_DESC_TYPE_M);
-    tx_desc->word0 = TX_DESC_SET(tx_desc->word0, 1, TX_DESC_80211_EN_S, TX_DESC_80211_EN_M);
-    tx_desc->word1 = packet_len;
-    tx_desc->word2 = driver->tx_head;
-
-    uint8_t *tx_buffer = driver->tx_desc_ring +
-        (driver->tx_head + AIC8800_MAX_TX_QUEUES) * AIC8800_TX_DESC_SIZE;
-    memcpy(tx_buffer, packet_data, packet_len);
-
-    driver->tx_head = (driver->tx_head + 1) % AIC8800_MAX_TX_QUEUES;
-
-    kern_return_t result = driver->usb_driver->SendData(tx_buffer, packet_len);
-
-    m_freem(m);
-    return result;
+    (void)data;
+    (void)length;
+    (void)param;
+    return kIOReturnUnsupported;
 }
 
 kern_return_t AIC8800_NetIf::InputPacket(const uint8_t *data, uint32_t length)

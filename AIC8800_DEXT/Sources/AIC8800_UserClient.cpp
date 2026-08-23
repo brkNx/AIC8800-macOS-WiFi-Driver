@@ -4,10 +4,19 @@
  * User Client Implementation
  */
 
-#include "AIC8800_Driver.h"
-#include "AIC8800_USB.iig"
-#include "AIC8800_NetIf.iig"
-#include "AIC8800_UserClient.iig"
+#include "AIC8800_UserClient.h"
+#include "AIC8800_USB.h"
+
+OSDefineMetaClassAndStructors(AIC8800_UserClient, IOUserClient)
+
+kern_return_t AIC8800_UserClient::Init(OSDictionary *dictionary)
+{
+    kern_return_t result = IOUserClient::Init(dictionary);
+    if (result != kIOReturnSuccess) {
+        return result;
+    }
+    return kIOReturnSuccess;
+}
 
 kern_return_t AIC8800_UserClient::Start(IOService *provider)
 {
@@ -29,9 +38,9 @@ kern_return_t AIC8800_UserClient::Free()
     return IOUserClient::Free();
 }
 
-kern_return_t AIC8800_UserClient::ExternalMethod(uint32_t selector,
-                                                  IOUserClientMethodArguments *arguments,
-                                                  const IOUserClientMethodDispatch *dispatch,
+kern_return_t AIC8800_UserClient::externalMethod(uint32_t selector,
+                                                  IOExternalMethodArguments *arguments,
+                                                  const IOExternalMethodDispatch *dispatch,
                                                   OSObject *target,
                                                   void *reference)
 {

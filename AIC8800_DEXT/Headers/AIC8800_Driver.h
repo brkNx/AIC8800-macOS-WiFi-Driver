@@ -20,6 +20,8 @@
 #include <USBDriverKit/IOUSBHostInterface.h>
 #include <USBDriverKit/IOUSBHostPipe.h>
 
+class AIC8800_USB;
+
 // ============================================================================
 // AIC8800 USB Identifiers
 // ============================================================================

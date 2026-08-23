@@ -37,9 +37,9 @@
 		000000000000000000000213 /* AIC8800_NetIf.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; name = AIC8800_NetIf.cpp; path = AIC8800_DEXT/Sources/AIC8800_NetIf.cpp; sourceTree = SOURCE_ROOT; };
 		000000000000000000000214 /* AIC8800_UserClient.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; name = AIC8800_UserClient.cpp; path = AIC8800_DEXT/Sources/AIC8800_UserClient.cpp; sourceTree = SOURCE_ROOT; };
 		000000000000000000000215 /* AIC8800_Driver.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = AIC8800_Driver.h; path = AIC8800_DEXT/Headers/AIC8800_Driver.h; sourceTree = SOURCE_ROOT; };
-		000000000000000000000216 /* AIC8800_USB.iig */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.iig; name = AIC8800_USB.iig; path = AIC8800_DEXT/Sources/AIC8800_USB.iig; sourceTree = SOURCE_ROOT; };
-		000000000000000000000217 /* AIC8800_NetIf.iig */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.iig; name = AIC8800_NetIf.iig; path = AIC8800_DEXT/Sources/AIC8800_NetIf.iig; sourceTree = SOURCE_ROOT; };
-		000000000000000000000218 /* AIC8800_UserClient.iig */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.iig; name = AIC8800_UserClient.iig; path = AIC8800_DEXT/Sources/AIC8800_UserClient.iig; sourceTree = SOURCE_ROOT; };
+		000000000000000000000221 /* AIC8800_USB.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = AIC8800_USB.h; path = AIC8800_DEXT/Headers/AIC8800_USB.h; sourceTree = SOURCE_ROOT; };
+		000000000000000000000222 /* AIC8800_NetIf.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = AIC8800_NetIf.h; path = AIC8800_DEXT/Headers/AIC8800_NetIf.h; sourceTree = SOURCE_ROOT; };
+		000000000000000000000223 /* AIC8800_UserClient.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = AIC8800_UserClient.h; path = AIC8800_DEXT/Headers/AIC8800_UserClient.h; sourceTree = SOURCE_ROOT; };
 		000000000000000000000219 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; name = Info.plist; path = AIC8800_DEXT/Info.plist; sourceTree = SOURCE_ROOT; };
 		00000000000000000000021A /* AIC8800_DEXT.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; name = AIC8800_DEXT.entitlements; path = AIC8800_DEXT/AIC8800_DEXT.entitlements; sourceTree = SOURCE_ROOT; };
 		000000000000000000000301 /* AIC8800WiFi.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = AIC8800WiFi.app; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -89,13 +89,13 @@
 			isa = PBXGroup;
 			children = (
 				000000000000000000000215 /* AIC8800_Driver.h */,
+				000000000000000000000221 /* AIC8800_USB.h */,
+				000000000000000000000222 /* AIC8800_NetIf.h */,
+				000000000000000000000223 /* AIC8800_UserClient.h */,
 				000000000000000000000211 /* AIC8800_USB.cpp */,
 				000000000000000000000212 /* AIC8800_HALInit.cpp */,
 				000000000000000000000213 /* AIC8800_NetIf.cpp */,
 				000000000000000000000214 /* AIC8800_UserClient.cpp */,
-				000000000000000000000216 /* AIC8800_USB.iig */,
-				000000000000000000000217 /* AIC8800_NetIf.iig */,
-				000000000000000000000218 /* AIC8800_UserClient.iig */,
 				000000000000000000000219 /* Info.plist */,
 				00000000000000000000021A /* AIC8800_DEXT.entitlements */,
 			);
@@ -323,8 +323,6 @@
 					"DriverKit",
 					"-framework",
 					"USBDriverKit",
-					"-framework",
-					"NetworkDriverKit",
 				);
 				PRODUCT_BUNDLE_IDENTIFIER = com.aic8800.wifi.dext;
 				PRODUCT_NAME = "$(TARGET_NAME)";
@@ -357,8 +355,6 @@
 					"DriverKit",
 					"-framework",
 					"USBDriverKit",
-					"-framework",
-					"NetworkDriverKit",
 				);
 				PRODUCT_BUNDLE_IDENTIFIER = com.aic8800.wifi.dext;
 				PRODUCT_NAME = "$(TARGET_NAME)";
