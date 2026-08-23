@@ -16,7 +16,6 @@
 
 #include <DriverKit/IOService.h>
 #include <DriverKit/IOBufferMemoryDescriptor.h>
-#include <DriverKit/IOTimerEventSource.h>
 #include <USBDriverKit/IOUSBHostDevice.h>
 #include <USBDriverKit/IOUSBHostInterface.h>
 #include <USBDriverKit/IOUSBHostPipe.h>
@@ -311,8 +310,8 @@ struct AIC8800_DriverData {
     uint32_t rx_head;
 
     // Timers
-    IOTimerEventSource *timer;
-    IOTimerEventSource *watchdog_timer;
+    void *timer;
+    void *watchdog_timer;
 
     // Synchronization
     IOLock *lock;
