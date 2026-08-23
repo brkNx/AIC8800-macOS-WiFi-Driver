@@ -98,9 +98,9 @@ class StatusManager: NSObject, ObservableObject {
         }
 
         // Create matching dictionary for AIC8800
-        let matchingDict = IOServiceMatching(kIOUSBDeviceClassName)
-        matchingDict[kIOUSBVendorID] = NSNumber(value: vendorID)
-        matchingDict[kIOUSBProductID] = NSNumber(value: productIDs[0])
+        let matchingDict = IOServiceMatching(kIOUSBDeviceClassName) as NSMutableDictionary
+        matchingDict["idVendor"] = NSNumber(value: vendorID)
+        matchingDict["idProduct"] = NSNumber(value: productIDs[0])
 
         // Register for device additions
         let selfRef = Unmanaged.passUnretained(self).toOpaque()
@@ -108,7 +108,7 @@ class StatusManager: NSObject, ObservableObject {
             notificationPort,
             kIOFirstMatchNotification,
             matchingDict,
-            deviceAddedCallback,
+            usbDeviceAddedCallback,
             selfRef,
             &usbAddedNotification
         )
@@ -147,8 +147,8 @@ class StatusManager: NSObject, ObservableObject {
 
             // Get device properties
             if let properties = getDeviceProperties(device) {
-                let vid = properties[kIOUSBVendorID] as? UInt16 ?? 0
-                let pid = properties[kIOUSBProductID] as? UInt16 ?? 0
+                let vid = properties["idVendor"] as? UInt16 ?? 0
+                let pid = properties["idProduct"] as? UInt16 ?? 0
 
                 appendLog("Device: VID=\(String(format: "%04X", vid)) PID=\(String(format: "%04X", pid))")
 
@@ -269,6 +269,19 @@ class StatusManager: NSObject, ObservableObject {
 
         print(entry, terminator: "")
     }
+}
+
+// ============================================================================
+// IOKit USB Callback
+// ============================================================================
+
+private func usbDeviceAddedCallback(
+    refcon: UnsafeMutableRawPointer?,
+    iterator: io_iterator_t
+) {
+    guard let refcon = refcon else { return }
+    let manager = Unmanaged<StatusManager>.fromOpaque(refcon).takeUnretainedValue()
+    manager.deviceAdded(iterator)
 }
 
 // ============================================================================
