@@ -78,7 +78,8 @@ class StatusManager: NSObject, ObservableObject {
     // Initialization
     // ============================================================================
 
-    init() {
+    override init() {
+        super.init()
         checkDriverInstalled()
     }
 
@@ -185,9 +186,9 @@ class StatusManager: NSObject, ObservableObject {
         appendLog("Starting driver installation...")
         driverStatus = .installing
 
-        let request = OSSystemExtensionRequest(
-            activationRequest(forExtensionWithIdentifier: "com.aic8800.wifi.dext",
-                              queue: .main)
+        let request = OSSystemExtensionRequest.activationRequest(
+            forExtensionWithIdentifier: "com.aic8800.wifi.dext",
+            queue: .main
         )
         request.delegate = self
 
@@ -198,9 +199,9 @@ class StatusManager: NSObject, ObservableObject {
     func uninstallDriver() {
         appendLog("Starting driver uninstallation...")
 
-        let request = OSSystemExtensionRequest(
-            deactivationRequest(forExtensionWithIdentifier: "com.aic8800.wifi.dext",
-                                queue: .main)
+        let request = OSSystemExtensionRequest.deactivationRequest(
+            forExtensionWithIdentifier: "com.aic8800.wifi.dext",
+            queue: .main
         )
         request.delegate = self
 
@@ -277,10 +278,10 @@ class StatusManager: NSObject, ObservableObject {
 extension StatusManager: OSSystemExtensionRequestDelegate {
     func request(
         _ request: OSSystemExtensionRequest,
-        actionForExtension extensionProperties: [String: Any],
-        beforeExtensionActivation before: Bool
-    ) -> OSSystemExtensionRequest.Action {
-        appendLog("Extension action requested (before activation: \(before))")
+        actionForReplacingExtension existing: OSSystemExtensionProperties,
+        withExtension ext: OSSystemExtensionProperties
+    ) -> OSSystemExtensionRequest.ReplacementAction {
+        appendLog("Extension replacing v\(existing.bundleShortVersion) with v\(ext.bundleShortVersion)")
         return .replace
     }
 
