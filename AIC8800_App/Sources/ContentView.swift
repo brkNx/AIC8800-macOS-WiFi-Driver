@@ -45,7 +45,7 @@ struct ContentView: View {
             GroupBox("Device Information") {
                 VStack(alignment: .leading, spacing: 10) {
                     InfoRow(label: "Chip", value: "AIC8800")
-                    InfoRow(label: "VID:PID", value: "A69C:8D81")
+                    InfoRow(label: "VID:PID", value: status.vidPid)
                     InfoRow(label: "MAC Address", value: status.macAddress)
                     InfoRow(label: "IP Address", value: status.ipAddress)
                     InfoRow(label: "Signal", value: "\(status.signalQuality)%")

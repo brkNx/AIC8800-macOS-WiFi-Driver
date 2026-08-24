@@ -27,6 +27,10 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         StatusManager.shared.startMonitoring()
     }
 
+    func applicationWillTerminate(_ notification: Notification) {
+        StatusManager.shared.stopMonitoring()
+    }
+
     func applicationShouldTerminateAfterLastWindowClosed(_ sender: NSApplication) -> Bool {
         return true
     }
