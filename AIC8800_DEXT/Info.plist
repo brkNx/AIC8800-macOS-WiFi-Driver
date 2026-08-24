@@ -37,6 +37,21 @@
 			<key>IOUserClientClass</key>
 			<string>AIC8800_UserClient</string>
 		</dict>
+		<key>AIC8800_WiFi_Only</key>
+		<dict>
+			<key>CFBundleIdentifier</key>
+			<string>$(PRODUCT_BUNDLE_IDENTIFIER)</string>
+			<key>IOClass</key>
+			<string>AIC8800_USB</string>
+			<key>IOProviderClass</key>
+			<string>IOUSBHostDevice</string>
+			<key>idVendor</key>
+			<integer>42652</integer>
+			<key>idProduct</key>
+			<integer>36227</integer>
+			<key>IOUserClientClass</key>
+			<string>AIC8800_UserClient</string>
+		</dict>
 	</dict>
 	<key>NSRequiresAquaSystemAppearance</key>
 	<false/>
