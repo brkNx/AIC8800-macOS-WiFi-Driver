@@ -71,9 +71,10 @@ class StatusManager: NSObject, ObservableObject {
     private var usbAddedNotification: io_object_t = 0
     private var usbRemovedNotification: io_object_t = 0
 
-    // Pending system extension operation. OSSystemExtensionRequest carries no
-    // userInfo, so track which verb the delegate callback belongs to.
-    private var pendingRequestIsDeactivation = false
+    // Pending system extension operations. OSSystemExtensionRequest carries
+    // no userInfo, so track which verb each request.id maps to; a single
+    // shared boolean races when install/uninstall requests overlap.
+    private var pendingRequestIsDeactivation: [String: Bool] = [:]
 
     // Constants
     private let vendorID: UInt16 = 0xA69C
@@ -248,13 +249,13 @@ class StatusManager: NSObject, ObservableObject {
     func installDriver() {
         appendLog("Starting driver installation...")
         driverStatus = .installing
-        pendingRequestIsDeactivation = false
 
         let request = OSSystemExtensionRequest.activationRequest(
             forExtensionWithIdentifier: dextIdentifier,
             queue: .main
         )
         request.delegate = self
+        pendingRequestIsDeactivation[request.identifier] = false
 
         OSSystemExtensionManager.shared.submitRequest(request)
         appendLog("System extension request submitted")
@@ -263,13 +264,13 @@ class StatusManager: NSObject, ObservableObject {
     func uninstallDriver() {
         appendLog("Starting driver uninstallation...")
         driverStatus = .installing
-        pendingRequestIsDeactivation = true
 
         let request = OSSystemExtensionRequest.deactivationRequest(
             forExtensionWithIdentifier: dextIdentifier,
             queue: .main
         )
         request.delegate = self
+        pendingRequestIsDeactivation[request.identifier] = true
 
         OSSystemExtensionManager.shared.submitRequest(request)
         appendLog("System extension deactivation request submitted")
@@ -278,14 +279,11 @@ class StatusManager: NSObject, ObservableObject {
     private func checkDriverInstalled() {
         // The DEXT populates an AIC8800_USB node in the IORegistry once it is
         // loaded; its presence is a reliable proxy for "installed and running".
-        let running = dextUserClientService != nil
         driverInstalled = false
         driverStatus = .notInstalled
-        if running {
+        if let service = dextUserClientService {
             driverInstalled = true
             driverStatus = .installed
-        }
-        if let service = dextUserClientService {
             IOObjectRelease(service)
         }
     }
@@ -384,7 +382,7 @@ extension StatusManager: OSSystemExtensionRequestDelegate {
     }
 
     func request(_ request: OSSystemExtensionRequest, didFinishWithResult result: OSSystemExtensionRequest.Result) {
-        let wasDeactivation = pendingRequestIsDeactivation
+        let wasDeactivation = pendingRequestIsDeactivation.removeValue(forKey: request.identifier) ?? false
 
         switch result {
         case .completed:
@@ -409,7 +407,7 @@ extension StatusManager: OSSystemExtensionRequestDelegate {
     }
 
     func request(_ request: OSSystemExtensionRequest, didFailWithError error: Error) {
-        let wasDeactivation = pendingRequestIsDeactivation
+        let wasDeactivation = pendingRequestIsDeactivation.removeValue(forKey: request.identifier) ?? false
         appendLog((wasDeactivation ? "Uninstallation" : "Installation")
             + " failed: \(error.localizedDescription)")
         DispatchQueue.main.async {
